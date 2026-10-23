@@ -40,13 +40,23 @@
       (program [[zero succ] (peano [zero succ tie])])
   ]
 
-  [
-    (one (answers (run [$zero $succ])))
-    (agree (answers (run [
-      nat
+  reading := [
+    collect :>
       [
-        ^nat :>
-          nat
+        model :>
+          (collect (answers (run model)))
       ]
-    ])))
   ]
+  valueReading := (reading one)
+  typeReading := (reading agree)
+
+  values := [$zero $succ]
+  types := [
+    nat
+    [
+      ^nat :>
+        nat
+    ]
+  ]
+
+  [(valueReading values) (typeReading types)]

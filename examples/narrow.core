@@ -1,6 +1,6 @@
 -- unknowns in the middle, solved by trying the rules where a left side demands it
 
-[tie foreign answers host prelude] :>
+[tie foreign solve host prelude] :>
   [number string bool | hostRest] := (host [foreign])
   [same one | preludeRest] := (prelude [tie number string bool])
   fix := tie
@@ -19,4 +19,4 @@
     #front
     (same [(append [[apple] #back]) [apple banana]])
     #back
-  ] |> answers |> one
+  ] |> solve |> one

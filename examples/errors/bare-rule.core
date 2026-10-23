@@ -1,4 +1,4 @@
-[tie foreign answers host prelude] :>
+[tie foreign solve host prelude] :>
   [number | hostRest] := (host [foreign])
   identity := (
     input :>

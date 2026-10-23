@@ -1,6 +1,6 @@
 -- the host leaves as generators: one model runs the program, the other types it
 
-[tie foreign answers host prelude] :>
+[tie foreign solve host prelude] :>
   [number string bool true false add sub mul lt le gt ge eq concat show] := (host [foreign])
   [same one agree numberType stringType addType subType mulType ltType leType gtType geType eqType concatType showType] := (
     prelude
@@ -27,6 +27,6 @@
   ]
 
   [
-    (one (answers (greeting [number string concat show add lt])))
-    (one (answers (greeting [numberType stringType concatType showType addType ltType])))
+    (one (solve (greeting [number string concat show add lt])))
+    (one (solve (greeting [numberType stringType concatType showType addType ltType])))
   ]

@@ -1,6 +1,6 @@
 -- a pattern knot: two definitions that refer to each other, read under two models with the same fix
 
-[tie foreign answers host prelude] :>
+[tie foreign solve host prelude] :>
   [number string bool true false | hostRest] := (host [foreign])
   [same one agree | preludeRest] := (prelude [tie number string bool])
   nat := $nat
@@ -25,8 +25,8 @@
   ]
 
   [
-    (one (answers (parity [$zero $succ true false tie])))
-    (agree (answers (parity [
+    (one (solve (parity [$zero $succ true false tie])))
+    (agree (solve (parity [
       nat
       [
         ^nat :>

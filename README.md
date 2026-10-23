@@ -38,7 +38,7 @@ cabal test
 ```
 
 The runner applies the first file to one chain: the core leaves `tie`, `foreign`,
-`answers`, then the other files, each as an unapplied rule. `host.core` turns `foreign`
+`solve`, then the other files, each as an unapplied rule. `host.core` turns `foreign`
 into the host's names. `prelude.core` holds `same`, `one`, `agree` and the host's type
 rules.
 

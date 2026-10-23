@@ -1,4 +1,4 @@
-[tie foreign answers host prelude] :>
+[tie foreign solve host prelude] :>
   [number string bool | hostRest] := (host [foreign])
   [same | preludeRest] := (prelude [tie number string bool])
   fix := tie

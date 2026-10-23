@@ -1,6 +1,6 @@
 -- the contract between two models, derived from the two model lists by a library rule
 
-[tie foreign answers host prelude] :>
+[tie foreign solve host prelude] :>
   [number string bool | hostRest] := (host [foreign])
   [same one agree | preludeRest] := (prelude [tie number string bool])
   fix := tie
@@ -64,8 +64,8 @@
     ]
   ]
 
-  values := (one (answers (program (peano [zero succ tie]))))
-  types := (agree (answers (program (peano [
+  values := (one (solve (program (peano [zero succ tie]))))
+  types := (agree (solve (program (peano [
     nat
     [
       ^nat :>

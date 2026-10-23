@@ -22,8 +22,8 @@ anyType = \case
   App (Sym a) (Sym ty) | a == anyName -> readMaybe ty
   _ -> Nothing
 
-answersName :: Name
-answersName = hostSym "answers"
+solveName :: Name
+solveName = hostSym "solve"
 
 hostTypeOf :: Term -> Maybe HostType
 hostTypeOf = \case
@@ -85,7 +85,7 @@ tieName :: Name
 tieName = hostSym "tie"
 
 coreLeaves :: [(Name, Term)]
-coreLeaves = [("tie", Sym tieName), ("foreign", Sym foreignName), ("answers", Sym answersName)]
+coreLeaves = [("tie", Sym tieName), ("foreign", Sym foreignName), ("solve", Sym solveName)]
 
 hostTable :: Map Name Term
 hostTable =

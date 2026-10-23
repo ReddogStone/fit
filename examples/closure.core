@@ -1,6 +1,6 @@
 -- anonymous rules, nesting, higher order
 
-[tie foreign answers host prelude] :>
+[tie foreign solve host prelude] :>
   [number string bool true false | hostRest] := (host [foreign])
   fix := tie
   apple := $apple

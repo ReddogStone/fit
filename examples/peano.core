@@ -1,6 +1,6 @@
 -- an algebra over its generators, a program over the algebra's exports, two models of the generators
 
-[tie foreign answers host prelude] :>
+[tie foreign solve host prelude] :>
   [number string bool | hostRest] := (host [foreign])
   [same one agree | preludeRest] := (prelude [tie number string bool])
   nat := $nat
@@ -43,7 +43,7 @@
   reading := [
     collect :> [
       model :>
-        (collect (answers (run model)))
+        (collect (solve (run model)))
     ]
   ]
   valueReading := (reading one)

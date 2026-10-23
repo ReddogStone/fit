@@ -1,6 +1,6 @@
 -- a name on the right side of its own line: outside rule bodies it is the old binding, inside them it is the knot
 
-[tie foreign answers host prelude] :>
+[tie foreign solve host prelude] :>
   [number string bool true false add sub mul lt le gt ge eq concat show] := (host [foreign])
   fix := tie
   add := add |> old :> [

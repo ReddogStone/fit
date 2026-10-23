@@ -152,7 +152,7 @@ whnf t = case t of
     f' <- whnf f
     case f' of
       Sym n | isHostName n -> select t (hostCandidates n) a
-      Sym n | n == answersName -> collect a
+      Sym n | n == solveName -> solutions a
       Sym n | n == foreignName -> foreignOf t a
       Sym n | n == tieName -> knotOf a
       Rule {} -> throw (NotARule t)
@@ -184,8 +184,8 @@ foreignOf node key =
     Sym s | Just t <- Map.lookup (shown s) hostTable -> pure t
     _ -> throw (NoRule node)
 
-collect :: Term -> M Term
-collect question = do
+solutions :: Term -> M Term
+solutions question = do
   outer <- get'
   let results = runM (nf question) outer
   case [e | Left (e, _) <- results, fatal e] of

@@ -1,6 +1,6 @@
 -- dispatch on a later position, a unique rule forcing an unknown
 
-[tie foreign answers host prelude] :>
+[tie foreign solve host prelude] :>
   positive := $positive
   blank := $blank
   zero := $zero

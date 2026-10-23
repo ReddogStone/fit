@@ -1,6 +1,6 @@
 -- a wrong alpha: the value answers do not land in the type answers
 
-[tie foreign answers host prelude] :>
+[tie foreign solve host prelude] :>
   [number string bool | hostRest] := (host [foreign])
   [same one agree | preludeRest] := (prelude [tie number string bool])
   fix := tie
@@ -37,8 +37,8 @@
       [(fn head) | (map [fn tail])]
   ]
 
-  values := (one (answers (program (peano [zero succ tie]))))
-  types := (agree (answers (program (peano [
+  values := (one (solve (program (peano [zero succ tie]))))
+  types := (agree (solve (program (peano [
     nat
     [
       ^nat :>

@@ -1,0 +1,4 @@
+no rule: (same [(append [[] [cherry]]) [apple banana]])
+no rule: (same [(append [[apple] [cherry]]) [apple banana]])
+no rule: (same [(append [[apple banana] [cherry]]) [apple banana]])
+no rule: (same [(append [[apple banana head | tail] [cherry]]) [apple banana]])

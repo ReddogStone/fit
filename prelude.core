@@ -1,0 +1,71 @@
+-- the prelude as a box: the knot and the host's type symbols in, policies and the host's type rules out
+
+[tie number string bool] :>
+  same := [
+    [x x] :>
+      x
+  ]
+  one := [
+    [x] :>
+      x
+  ]
+  agree := (tie [
+    self :>
+      [
+        [x] :>
+          x
+        [x y | r] :>
+          (same [x (self [y | r])])
+      ]
+  ])
+  numberType := [
+    x :>
+      number
+  ]
+  stringType := [
+    x :>
+      string
+  ]
+  addType := [
+    [^number ^number] :>
+      number
+  ]
+  subType := [
+    [^number ^number] :>
+      number
+  ]
+  mulType := [
+    [^number ^number] :>
+      number
+  ]
+  ltType := [
+    [^number ^number] :>
+      bool
+  ]
+  leType := [
+    [^number ^number] :>
+      bool
+  ]
+  gtType := [
+    [^number ^number] :>
+      bool
+  ]
+  geType := [
+    [^number ^number] :>
+      bool
+  ]
+  eqType := [
+    [^number ^number] :>
+      bool
+    [^string ^string] :>
+      bool
+  ]
+  concatType := [
+    [^string ^string] :>
+      string
+  ]
+  showType := [
+    [^number] :>
+      string
+  ]
+  [same one agree numberType stringType addType subType mulType ltType leType gtType geType eqType concatType showType]

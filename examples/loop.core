@@ -1,0 +1,11 @@
+-- an application that meets itself while it is being evaluated answers with a fresh unknown instead of running forever
+
+[tie foreign answers host prelude] :>
+  [number | hostRest] := (host [foreign])
+  fix := tie
+  loop := [
+    count :>
+      (loop count)
+  ]
+
+  (loop 1)

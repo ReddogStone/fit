@@ -1,0 +1,50 @@
+-- a wrong alpha: the value answers do not land in the type answers
+
+[tie foreign answers host prelude] :>
+  [number string bool | hostRest] := (host [foreign])
+  [same one agree | preludeRest] := (prelude [tie number string bool])
+  fix := tie
+  nat := $nat
+  zero := $zero
+  succ := $succ
+
+  peano := [
+    [zero succ fix] :>
+      add := [
+        [^zero right] :>
+          right
+        [(^succ left) right] :>
+          (succ (add [left right]))
+      ]
+      [zero succ add]
+  ]
+
+  program := [
+    [zero succ add] :>
+      [(add [(succ zero) zero]) zero]
+  ]
+
+  alpha := [
+    ^zero :>
+      nat
+    (^succ below) :>
+      (succ (alpha below))
+  ]
+  map := [
+    [fn []] :>
+      []
+    [fn [head | tail]] :>
+      [(fn head) | (map [fn tail])]
+  ]
+
+  values := (one (answers (program (peano [zero succ tie]))))
+  types := (agree (answers (program (peano [
+    nat
+    [
+      ^nat :>
+        nat
+    ]
+    tie
+  ]))))
+
+  (same [(map [alpha values]) types])

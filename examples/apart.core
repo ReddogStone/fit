@@ -1,0 +1,30 @@
+-- dispatch on a later position, a unique rule forcing an unknown
+
+[tie foreign answers host prelude] :>
+  positive := $positive
+  blank := $blank
+  zero := $zero
+  succ := $succ
+  just := $just
+  nothing := $nothing
+  secret := $secret
+  whatever := $whatever
+
+  isPositive := [
+    [ignored ^zero] :>
+      blank
+    [ignored (^succ below)] :>
+      positive
+  ]
+  hasValue := [
+    (^just content) :>
+      positive
+    ^nothing :>
+      blank
+  ]
+  onlyZero := [
+    ^zero :>
+      zero
+  ]
+
+  [(isPositive [whatever (succ zero)]) (hasValue (just secret)) (onlyZero #unknown) #unknown]

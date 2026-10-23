@@ -1,0 +1,48 @@
+-- an algebra over its generators, a program over the algebra's exports, two models of the generators
+
+[tie foreign answers host prelude] :>
+  [number string bool | hostRest] := (host [foreign])
+  [same one agree | preludeRest] := (prelude [tie number string bool])
+  nat := $nat
+
+  peano := [
+    [zero succ fix] :>
+      add := [
+        [^zero right] :>
+          right
+        [(^succ left) right] :>
+          (succ (add [left right]))
+      ]
+      mul := [
+        [^zero right] :>
+          zero
+        [(^succ left) right] :>
+          (add [right (mul [left right])])
+      ]
+      fact := [
+        ^zero :>
+          (succ zero)
+        (^succ below) :>
+          (mul [(succ below) (fact below)])
+      ]
+      [zero succ add fact]
+  ]
+
+  program := [
+    [zero succ add fact] :>
+      two := (succ (succ zero))
+      three := (succ two)
+      [(add [two two]) (fact three) (add [(succ zero) #unknown])]
+  ]
+
+  [
+    (one (answers (program (peano [$zero $succ tie]))))
+    (agree (answers (program (peano [
+      nat
+      [
+        ^nat :>
+          nat
+      ]
+      tie
+    ]))))
+  ]

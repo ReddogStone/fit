@@ -1,0 +1,1 @@
+[apple (succ (succ zero)) (succ (succ zero)) [(succ zero) (succ (succ zero))] [[apple apple] [banana banana]] banana (succ (succ zero)) (succ (succ (succ (succ zero)))) true false]

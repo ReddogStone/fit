@@ -1,0 +1,28 @@
+cabal-version: 3.0
+name:          core
+version:       0.1.0.0
+build-type:    Simple
+
+common shared
+  default-language:   GHC2021
+  default-extensions: LambdaCase, OverloadedStrings
+  ghc-options:        -Wall -Wno-name-shadowing
+  build-depends:      base >=4.16, containers, mtl, megaparsec >=9, text
+
+library
+  import:          shared
+  hs-source-dirs:  src
+  exposed-modules: Term, Host, Parse, Core, Run, Format
+
+executable core
+  import:         shared
+  hs-source-dirs: app
+  main-is:        Main.hs
+  build-depends:  core, directory, filepath
+
+test-suite examples
+  import:         shared
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is:        Main.hs
+  build-depends:  core, directory, filepath

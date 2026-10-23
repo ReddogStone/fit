@@ -1,0 +1,118 @@
+-- a monad is a chain of two functions, return and bind; generic functions take it as their first argument
+
+[tie foreign answers host prelude] :>
+  [number string bool true false add sub mul lt le gt ge eq concat show] := (host [foreign])
+  fix := tie
+  just := $just
+  nothing := $nothing
+
+  return := [
+    [wrap chain] :>
+      wrap
+  ]
+  bind := [
+    [wrap chain] :>
+      chain
+  ]
+
+  bindMaybe := [
+    [^nothing next] :>
+      nothing
+    [(^just content) next] :>
+      (next content)
+  ]
+  maybeMonad := [
+    [
+      content :>
+        (just content)
+    ]
+    [
+      [maybe next] :>
+        (bindMaybe [maybe next])
+    ]
+  ]
+
+  append := [
+    [[] rest] :>
+      rest
+    [[head | tail] rest] :>
+      [head | (append [tail rest])]
+  ]
+  concatMap := [
+    [fn []] :>
+      []
+    [fn [head | tail]] :>
+      (append [(fn head) (concatMap [fn tail])])
+  ]
+  listMonad := [
+    [
+      content :>
+        [content]
+    ]
+    [
+      [list next] :>
+        (concatMap [next list])
+    ]
+  ]
+
+  lift2 := [
+    [monad combine first second] :>
+      ((bind monad) [
+        first
+        [
+          left :>
+            ((bind monad) [
+              second
+              [
+                right :>
+                  ((return monad) (combine [left right]))
+              ]
+            ])
+        ]
+      ])
+  ]
+  mapMonad := [
+    [monad fn []] :>
+      ((return monad) [])
+    [monad fn [head | tail]] :>
+      ((bind monad) [
+        (fn head)
+        [
+          mapped :>
+            ((bind monad) [
+              (mapMonad [monad fn tail])
+              [
+                rest :>
+                  ((return monad) [mapped | rest])
+              ]
+            ])
+        ]
+      ])
+  ]
+
+  branch := [
+    [^true then else] :>
+      then
+    [^false then else] :>
+      else
+  ]
+  safeDec := [
+    count :>
+      (branch [(gt [count 0]) (just (sub [count 1])) nothing])
+  ]
+
+  [
+    (lift2 [maybeMonad add (just 2) (just 3)])
+    (lift2 [maybeMonad add (just 2) nothing])
+    (lift2 [listMonad add [1 2] [10 20]])
+    (mapMonad [maybeMonad safeDec [3 2]])
+    (mapMonad [maybeMonad safeDec [3 0]])
+    (mapMonad [
+      listMonad
+      [
+        count :>
+          [count (mul [count 10])]
+      ]
+      [1 2]
+    ])
+  ]

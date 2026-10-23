@@ -1,0 +1,12 @@
+[tie foreign answers host prelude] :>
+  yes := $yes
+  maybe := $maybe
+  zero := $zero
+  isZero := [
+    ^zero :>
+      yes
+    anything :>
+      maybe
+  ]
+
+  (isZero zero)

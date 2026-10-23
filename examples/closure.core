@@ -1,0 +1,73 @@
+-- anonymous rules, nesting, higher order
+
+[tie foreign answers host prelude] :>
+  [number string bool true false | hostRest] := (host [foreign])
+  fix := tie
+  apple := $apple
+  banana := $banana
+  zero := $zero
+  succ := $succ
+  anything := $anything
+
+  always := [
+    kept :>
+      [
+        dropped :>
+          kept
+      ]
+  ]
+  twice := [
+    step :>
+      [
+        start :>
+          (step (step start))
+      ]
+  ]
+  compose := [
+    [outer inner] :>
+      [
+        input :>
+          (outer (inner input))
+      ]
+  ]
+  map := [
+    [fn []] :>
+      []
+    [fn [head | tail]] :>
+      [(fn head) | (map [fn tail])]
+  ]
+
+  [doubled quadrupled] := [(twice succ) (twice (twice succ))]
+  [even odd] := [
+    [
+      ^zero :>
+        true
+      (^succ below) :>
+        (odd below)
+    ]
+    [
+      ^zero :>
+        false
+      (^succ below) :>
+        (even below)
+    ]
+  ]
+
+  [
+    ((always apple) banana)
+    ((twice succ) zero)
+    ((compose [succ succ]) zero)
+    (map [succ [zero (succ zero)]])
+    (map [
+      [
+        item :>
+          [item item]
+      ]
+      [apple banana]
+    ])
+    ((always banana) anything)
+    (doubled zero)
+    (quadrupled zero)
+    (even (succ (succ zero)))
+    (odd (succ (succ zero)))
+  ]

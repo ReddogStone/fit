@@ -1,0 +1,19 @@
+-- the host as a box: foreign in, the host's names out
+
+[foreign] :>
+  number := (foreign $number)
+  string := (foreign $string)
+  bool := (foreign $bool)
+  true := (foreign $true)
+  false := (foreign $false)
+  add := (foreign $add)
+  sub := (foreign $sub)
+  mul := (foreign $mul)
+  lt := (foreign $lt)
+  le := (foreign $le)
+  gt := (foreign $gt)
+  ge := (foreign $ge)
+  eq := (foreign $eq)
+  concat := (foreign $concat)
+  show := (foreign $show)
+  [number string bool true false add sub mul lt le gt ge eq concat show]

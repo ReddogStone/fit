@@ -1,0 +1,4 @@
+[[apple banana] [] [apple banana]]
+[[apple banana] [apple] [banana]]
+[[apple banana] [apple banana] []]
+no rule: (same [(append [[apple banana head | tail] back]) [apple banana]])

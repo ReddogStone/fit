@@ -1,0 +1,79 @@
+-- the contract between two models, derived from the two model lists by a library rule
+
+[tie foreign answers host prelude] :>
+  [number string bool | hostRest] := (host [foreign])
+  [same one agree | preludeRest] := (prelude [tie number string bool])
+  fix := tie
+  nat := $nat
+  zero := $zero
+  succ := $succ
+
+  peano := [
+    [zero succ fix] :>
+      add := [
+        [^zero right] :>
+          right
+        [(^succ left) right] :>
+          (succ (add [left right]))
+      ]
+      fact := [
+        ^zero :>
+          (succ zero)
+        (^succ below) :>
+          (add [(succ below) (fact below)])
+      ]
+      [zero succ add fact]
+  ]
+
+  program := [
+    [zero succ add fact] :>
+      two := (succ (succ zero))
+      [(add [two two]) (fact two) [zero two]]
+  ]
+
+  alphaOf := [
+    [[] [] self] :>
+      [
+        [] :>
+          []
+        [head | tail] :>
+          [(self head) | (self tail)]
+      ]
+    [[v | vs] [t | ts] self] :>
+      [
+        ^v :>
+          t
+        (^v inner) :>
+          (t (self inner))
+        | (alphaOf [vs ts self])
+      ]
+  ]
+  contract := [
+    [generators values types] :>
+      alpha := (tie [
+        self :>
+          (alphaOf [values types self])
+      ])
+      (alpha generators)
+  ]
+
+  valueModel := [zero succ]
+  typeModel := [
+    nat
+    [
+      ^nat :>
+        nat
+    ]
+  ]
+
+  values := (one (answers (program (peano [zero succ tie]))))
+  types := (agree (answers (program (peano [
+    nat
+    [
+      ^nat :>
+        nat
+    ]
+    tie
+  ]))))
+
+  (same [(contract [values valueModel typeModel]) types])

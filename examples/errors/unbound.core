@@ -1,0 +1,8 @@
+[tie foreign answers host prelude] :>
+  [number string bool true false add sub mul lt le gt ge eq concat show] := (host [foreign])
+  greet := [
+    name :>
+      (concat ["hello " nmae])
+  ]
+
+  (greet "world")

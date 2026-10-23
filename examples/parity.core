@@ -1,0 +1,39 @@
+-- a pattern knot: two definitions that refer to each other, read under two models with the same fix
+
+[tie foreign answers host prelude] :>
+  [number string bool true false | hostRest] := (host [foreign])
+  [same one agree | preludeRest] := (prelude [tie number string bool])
+  nat := $nat
+
+  parity := [
+    [zero succ true false fix] :>
+      [even odd] := [
+        [
+          ^zero :>
+            true
+          (^succ below) :>
+            (odd below)
+        ]
+        [
+          ^zero :>
+            false
+          (^succ below) :>
+            (even below)
+        ]
+      ]
+      [(even (succ (succ zero))) (odd (succ (succ (succ zero))))]
+  ]
+
+  [
+    (one (answers (parity [$zero $succ true false tie])))
+    (agree (answers (parity [
+      nat
+      [
+        ^nat :>
+          nat
+      ]
+      bool
+      bool
+      tie
+    ])))
+  ]

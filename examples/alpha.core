@@ -1,0 +1,57 @@
+-- the contract between two models: value answers mapped through alpha must be the type answers
+
+[tie foreign answers host prelude] :>
+  [number string bool | hostRest] := (host [foreign])
+  [same one agree | preludeRest] := (prelude [tie number string bool])
+  fix := tie
+  nat := $nat
+  zero := $zero
+  succ := $succ
+
+  peano := [
+    [zero succ fix] :>
+      add := [
+        [^zero right] :>
+          right
+        [(^succ left) right] :>
+          (succ (add [left right]))
+      ]
+      fact := [
+        ^zero :>
+          (succ zero)
+        (^succ below) :>
+          (add [(succ below) (fact below)])
+      ]
+      [zero succ add fact]
+  ]
+
+  program := [
+    [zero succ add fact] :>
+      two := (succ (succ zero))
+      [(add [two two]) (fact two) (add [(succ zero) #unknown])]
+  ]
+
+  alpha := [
+    ^zero :>
+      nat
+    (^succ below) :>
+      nat
+  ]
+  map := [
+    [fn []] :>
+      []
+    [fn [head | tail]] :>
+      [(fn head) | (map [fn tail])]
+  ]
+
+  values := (one (answers (program (peano [zero succ tie]))))
+  types := (agree (answers (program (peano [
+    nat
+    [
+      ^nat :>
+        nat
+    ]
+    tie
+  ]))))
+
+  (same [(map [alpha values]) types])

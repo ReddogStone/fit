@@ -1,0 +1,22 @@
+-- unknowns in the middle, solved by trying the rules where a left side demands it
+
+[tie foreign answers host prelude] :>
+  [number string bool | hostRest] := (host [foreign])
+  [same one | preludeRest] := (prelude [tie number string bool])
+  fix := tie
+  apple := $apple
+  banana := $banana
+  append := [
+    [[] rest] :>
+      rest
+    [[head | tail] rest] :>
+      [head | (append [tail rest])]
+  ]
+
+  [
+    (append [[apple] [banana]])
+    (same [(append [#front [banana]]) [apple banana]])
+    #front
+    (same [(append [[apple] #back]) [apple banana]])
+    #back
+  ] |> answers |> one

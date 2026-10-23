@@ -1,0 +1,1 @@
+no rule: (same [(map [alpha [(succ zero) zero]]) [nat nat]])

@@ -1,0 +1,8 @@
+[tie foreign answers host prelude] :>
+  [number | hostRest] := (host [foreign])
+  identity := (
+    input :>
+      input
+  )
+
+  (identity 5)

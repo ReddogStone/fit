@@ -1,0 +1,10 @@
+[tie foreign answers host prelude] :>
+  [number string bool true false add | hostRest] := (host [foreign])
+  length := [
+    [] :>
+      0
+    [head | tail] :>
+      (add [(length tail) 1])
+  ]
+
+  (length [1 2])

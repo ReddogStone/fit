@@ -1,0 +1,14 @@
+[tie foreign answers host prelude] :>
+  positive := $positive
+  blank := $blank
+  secret := $secret
+  just := $just
+  nothing := $nothing
+  hasValue := [
+    (^just content) :>
+      positive
+    ^nothing :>
+      blank
+  ]
+
+  (hasValue secret)

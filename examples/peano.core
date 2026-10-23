@@ -25,24 +25,28 @@
         (^succ below) :>
           (mul [(succ below) (fact below)])
       ]
-      [zero succ add fact]
+      [add fact]
   ]
 
   program := [
-    [zero succ add fact] :>
+    [[zero succ] [add fact]] :>
       two := (succ (succ zero))
       three := (succ two)
       [(add [two two]) (fact three) (add [(succ zero) #unknown])]
   ]
 
+  run := [
+    [zero succ] :>
+      (program [[zero succ] (peano [zero succ tie])])
+  ]
+
   [
-    (one (answers (program (peano [$zero $succ tie]))))
-    (agree (answers (program (peano [
+    (one (answers (run [$zero $succ])))
+    (agree (answers (run [
       nat
       [
         ^nat :>
           nat
       ]
-      tie
-    ]))))
+    ])))
   ]

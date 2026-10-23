@@ -3,11 +3,10 @@
 [tie foreign answers host prelude] :>
   [number string bool true false add sub mul lt le gt ge eq concat show] := (host [foreign])
   fix := tie
-  add := add |> old :>
-    [
-      [left right] :>
-        (concat [(show [left]) (concat [(show [right]) (show [(old [left right])])])])
-    ]
+  add := add |> old :> [
+    [left right] :>
+      (concat [(show [left]) (concat [(show [right]) (show [(old [left right])])])])
+  ]
   length := [
     0
       <: []

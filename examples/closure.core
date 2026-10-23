@@ -10,25 +10,22 @@
   anything := $anything
 
   always := [
-    kept :>
-      [
-        dropped :>
-          kept
-      ]
+    kept :> [
+      dropped :>
+        kept
+    ]
   ]
   twice := [
-    step :>
-      [
-        start :>
-          (step (step start))
-      ]
+    step :> [
+      start :>
+        (step (step start))
+    ]
   ]
   compose := [
-    [outer inner] :>
-      [
-        input :>
-          (outer (inner input))
-      ]
+    [outer inner] :> [
+      input :>
+        (outer (inner input))
+    ]
   ]
   map := [
     [fn []] :>

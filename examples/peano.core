@@ -41,11 +41,10 @@
   ]
 
   reading := [
-    collect :>
-      [
-        model :>
-          (collect (answers (run model)))
-      ]
+    collect :> [
+      model :>
+        (collect (answers (run model)))
+    ]
   ]
   valueReading := (reading one)
   typeReading := (reading agree)

@@ -10,13 +10,12 @@
       x
   ]
   agree := (tie [
-    self :>
-      [
-        [x] :>
-          x
-        [x y | r] :>
-          (same [x (self [y | r])])
-      ]
+    self :> [
+      [x] :>
+        x
+      [x y | r] :>
+        (same [x (self [y | r])])
+    ]
   ])
   numberType := [
     x :>

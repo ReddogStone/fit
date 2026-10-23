@@ -32,21 +32,19 @@
   ]
 
   alphaOf := [
-    [[] [] self] :>
-      [
-        [] :>
-          []
-        [head | tail] :>
-          [(self head) | (self tail)]
-      ]
-    [[v | vs] [t | ts] self] :>
-      [
-        ^v :>
-          t
-        (^v inner) :>
-          (t (self inner))
-        | (alphaOf [vs ts self])
-      ]
+    [[] [] self] :> [
+      [] :>
+        []
+      [head | tail] :>
+        [(self head) | (self tail)]
+    ]
+    [[v | vs] [t | ts] self] :> [
+      ^v :>
+        t
+      (^v inner) :>
+        (t (self inner))
+      | (alphaOf [vs ts self])
+    ]
   ]
   contract := [
     [generators values types] :>

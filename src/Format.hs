@@ -76,7 +76,7 @@ layout indent column raw = case flat raw of
         ++ maybe "" (\t -> pad inner ++ "| " ++ layout inner (inner + 2) t ++ "\n") rest
         ++ pad indent
         ++ "]"
-    RRule Forward l r -> layout indent column l ++ " :>\n" ++ pad inner ++ body inner inner r
+    RRule Forward l r -> layout indent column l ++ " :>" ++ ruleBody r
     RRule Reversed l r -> body indent column r ++ "\n" ++ pad inner ++ "<: " ++ layout inner (inner + 3) l
     RPipe start steps -> operand indent column start ++ concatMap ((" |> " ++) . step) steps
     RApp f a | Just head <- flatOperand f, column + length head + 2 <= width -> "(" ++ head ++ " " ++ operand indent (column + length head + 2) a ++ ")"
@@ -86,6 +86,9 @@ layout indent column raw = case flat raw of
   where
     inner = indent + 2
     pad n = replicate n ' '
+    ruleBody r = case r of
+      RChain {} | maybe True (\s -> inner + length s > width) (flat r) -> " " ++ layout indent inner r
+      _ -> "\n" ++ pad inner ++ body inner inner r
     step = \case
       Feed f -> operand indent inner f
       Into r -> layout indent inner r

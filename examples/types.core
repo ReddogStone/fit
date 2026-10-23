@@ -14,11 +14,10 @@
           (concat ["hello " name])
       ]
       twice := [
-        step :>
-          [
-            start :>
-              (step (step start))
-          ]
+        step :> [
+          start :>
+            (step (step start))
+        ]
       ]
       inc := [
         count :>

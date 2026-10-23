@@ -25,7 +25,8 @@ left :> right          a rule; `right <: left` is the same rule written backward
 $name                  a new symbol, created once
 ```
 
-Names are case-insensitive. A file is one rule: `inputs :> lines ... result`.
+Names are case-insensitive. A file is one rule, `left :> right`. The right side is any
+term; usually it is a scope, lines followed by a result.
 
 ## Running
 

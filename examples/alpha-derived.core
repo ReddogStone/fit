@@ -2,7 +2,7 @@
 
 [tie foreign solve host prelude] :>
   [number string bool | hostRest] := (host [foreign])
-  [same one agree | preludeRest] := (prelude [tie number string bool])
+  [same assertOne assertAgree | preludeRest] := (prelude [tie number string bool])
   fix := tie
   nat := $nat
   zero := $zero
@@ -64,8 +64,8 @@
     ]
   ]
 
-  values := (one (solve (program (peano [zero succ tie]))))
-  types := (agree (solve (program (peano [
+  values := (assertOne (solve (program (peano [zero succ tie]))))
+  types := (assertAgree (solve (program (peano [
     nat
     [
       ^nat :>

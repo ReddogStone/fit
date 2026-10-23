@@ -5,11 +5,11 @@
     [x x] :>
       x
   ]
-  one := [
+  assertOne := [
     [x] :>
       x
   ]
-  agree := (tie [
+  assertAgree := (tie [
     self :> [
       [x] :>
         x
@@ -67,4 +67,20 @@
     [^number] :>
       string
   ]
-  [same one agree numberType stringType addType subType mulType ltType leType gtType geType eqType concatType showType]
+  [
+    same
+    assertOne
+    assertAgree
+    numberType
+    stringType
+    addType
+    subType
+    mulType
+    ltType
+    leType
+    gtType
+    geType
+    eqType
+    concatType
+    showType
+  ]

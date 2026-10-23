@@ -2,7 +2,7 @@
 
 [tie foreign solve host prelude] :>
   [number string bool | hostRest] := (host [foreign])
-  [same one agree | preludeRest] := (prelude [tie number string bool])
+  [same assertOne assertAgree | preludeRest] := (prelude [tie number string bool])
   nat := $nat
 
   peano := [
@@ -41,13 +41,13 @@
   ]
 
   reading := [
-    collect :> [
+    assertion :> [
       model :>
-        (collect (solve (run model)))
+        (assertion (solve (run model)))
     ]
   ]
-  valueReading := (reading one)
-  typeReading := (reading agree)
+  valueReading := (reading assertOne)
+  typeReading := (reading assertAgree)
 
   values := [$zero $succ]
   types := [

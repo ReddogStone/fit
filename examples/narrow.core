@@ -2,7 +2,7 @@
 
 [tie foreign solve host prelude] :>
   [number string bool | hostRest] := (host [foreign])
-  [same one | preludeRest] := (prelude [tie number string bool])
+  [same assertOne | preludeRest] := (prelude [tie number string bool])
   fix := tie
   apple := $apple
   banana := $banana
@@ -19,4 +19,4 @@
     #front
     (same [(append [[apple] #back]) [apple banana]])
     #back
-  ] |> solve |> one
+  ] |> solve |> assertOne

@@ -49,7 +49,9 @@
   readValues := (readWith assertOne)
   readTypes := (readWith assertAgree)
 
-  valueModel := [$zero $succ]
+  zero := $zero
+  succ := $succ
+  valueModel := [zero succ]
   typeModel := [
     nat
     [
@@ -61,4 +63,7 @@
   values := (readValues valueModel)
   types := (readTypes typeModel)
 
-  [values types]
+  four := (succ (succ (succ (succ zero))))
+  six := (succ (succ four))
+
+  [(same [values [four six]]) (same [types [nat nat]])]

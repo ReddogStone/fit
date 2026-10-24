@@ -1,0 +1,76 @@
+-- a flow: lines joined by the bind in scope; the flow imports its monad's names and never sees how bind works
+
+[tie foreign solve host prelude] :>
+  [number string bool true false add sub mul lt le gt ge hostEq | hostRest] := (host [foreign])
+  [same assertOne assertAgree | preludeRest] := (prelude [tie number string bool])
+  fix := tie
+  just := $just
+  nothing := $nothing
+
+  branch := [
+    [^true then else] :>
+      then
+    [^false then else] :>
+      else
+  ]
+  append := [
+    [[] rest] :>
+      rest
+    [[head | tail] rest] :>
+      [head | (append [tail rest])]
+  ]
+  concatMap := [
+    [fn []] :>
+      []
+    [fn [head | tail]] :>
+      (append [(fn head) (concatMap [fn tail])])
+  ]
+
+  maybeMonad := [
+    [
+      content :>
+        (just content)
+    ]
+    [
+      [^nothing next] :>
+        nothing
+      [(^just content) next] :>
+        (next content)
+    ]
+  ]
+  listMonad := [
+    [
+      content :>
+        [content]
+    ]
+    [
+      [list next] :>
+        (concatMap [next list])
+    ]
+  ]
+
+  safeDec := [
+    count :>
+      (branch [(gt [count 0]) (just (sub [count 1])) nothing])
+  ]
+  safeSum := [
+    [left right] :>
+      [return bind] := maybeMonad
+      x <- (safeDec left)
+      y <- (safeDec right)
+      (return (add [x y]))
+  ]
+
+  pairs := [
+    [lefts rights] :>
+      [return bind] := listMonad
+      x <- lefts
+      y <- rights
+      (return [x y])
+  ]
+
+  [
+    (same [(safeSum [3 5]) (just 6)])
+    (same [(safeSum [3 0]) nothing])
+    (same [(pairs [[1 2] [10 20]]) [[1 10] [1 20] [2 10] [2 20]]])
+  ]

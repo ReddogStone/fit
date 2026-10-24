@@ -117,5 +117,8 @@ layout indent column raw = case flat raw of
     step = \case
       Feed f -> operand indent inner f
       Into r -> layout indent inner r
-    line b = let left = maybe "" id (flatLeft (pattern b)) in left ++ " := " ++ body indent (indent + length left + 4) (value b)
+    line b = let left = maybe "" id (flatLeft (pattern b)) in left ++ arrow (joiner b) ++ body indent (indent + length left + 4) (value b)
+    arrow = \case
+      Let -> " := "
+      Bind -> " <- "
     piece i g s = (if i == 0 then "" else "\n" ++ (if g then "\n" else "") ++ pad indent) ++ s

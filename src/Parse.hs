@@ -1,4 +1,4 @@
-module Parse (parseFile, readRaw, Raw (..), Arrow (..), Step (..), Binding (..)) where
+module Parse (parseFile, readRaw, Raw (..), Arrow (..), Step (..), Binding (..), Joiner (..)) where
 
 import Control.Monad (forM_, void, when)
 import Data.Char (isLower, isSpace, isUpper, toLower)
@@ -49,7 +49,9 @@ applicable = \case
   rule@RRule {} -> RChain [rule] Nothing
   other -> other
 
-data Binding = Binding {pattern :: Raw, knot :: Bool, gap :: Bool, value :: Raw}
+data Joiner = Let | Bind deriving (Eq)
+
+data Binding = Binding {pattern :: Raw, joiner :: Joiner, gap :: Bool, value :: Raw}
 
 parseFile :: FilePath -> Text -> Either String Term
 parseFile path input = do
@@ -97,7 +99,7 @@ identifier = lexeme $ do
   pure (c : rest)
 
 binding :: Parser Binding
-binding = Binding <$> (atom <* symbol ":=") <*> pure True <*> pure False <*> pipe
+binding = Binding <$> atom <*> (Let <$ symbol ":=" <|> Bind <$ symbol "<-") <*> pure False <*> pipe
 
 term :: Parser Raw
 term = do
@@ -318,12 +320,17 @@ convert env = \case
         (tied, renamed) = foldr (\n (p, raw) -> let (q, raw') = underRules n (stand n) raw in (p || q, raw')) (False, value b) holes
     inner <- convert bound (RScope rest g result)
     valueTerm <-
-      if tied && knot b
+      if tied
         then do
           fix <- either (const (Left "a recursive line needs fix in scope")) Right (go (RVar "fix"))
           App fix . chain . (: []) . Rule [self] (Var 0 0) <$> convert env {frames = [self] : frames env} renamed
         else go (value b)
-    App . chain . (: []) <$> (Rule holes <$> convert bound (pattern b) <*> pure inner) <*> pure valueTerm
+    line <- chain . (: []) <$> (Rule holes <$> convert bound (pattern b) <*> pure inner)
+    case joiner b of
+      Let -> pure (App line valueTerm)
+      Bind -> do
+        bind <- either (const (Left "a bind line needs bind in scope")) Right (go (RVar "bind"))
+        pure (App bind (chain [valueTerm, line]))
   where
     go = convert env
     resolve v = case lookupVar 0 (frames env) v of

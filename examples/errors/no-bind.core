@@ -1,0 +1,4 @@
+[tie foreign solve host prelude] :>
+  just := $just
+  content <- (just just)
+  content

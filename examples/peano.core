@@ -32,7 +32,7 @@
     [[zero succ] [add fact]] :>
       two := (succ (succ zero))
       three := (succ two)
-      [(add [two two]) (fact three) (add [(succ zero) #unknown])]
+      [(add [two two]) (fact three)]
   ]
 
   run := [

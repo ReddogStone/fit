@@ -1,1 +1,1 @@
-[[(succ (succ (succ (succ zero)))) (succ (succ (succ (succ (succ (succ zero))))))] [nat nat]]
+[(succ (succ (succ (succ zero)))) (succ (succ (succ (succ (succ (succ zero)))))) nat nat]

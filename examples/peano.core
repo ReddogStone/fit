@@ -60,10 +60,15 @@
     ]
   ]
 
-  values := (readValues valueModel)
-  types := (readTypes typeModel)
+  [value1 value2] := (readValues valueModel)
+  [type1 type2] := (readTypes typeModel)
 
   four := (succ (succ (succ (succ zero))))
-  six := (succ (succ four))
+  six := (succ (succ (succ (succ (succ (succ zero))))))
 
-  [(same [values [four six]]) (same [types [nat nat]])]
+  [
+    (same [value1 four])
+    (same [value2 six])
+    (same [type1 nat])
+    (same [type2 nat])
+  ]

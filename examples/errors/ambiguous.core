@@ -11,4 +11,8 @@
       [head | (append [tail rest])]
   ]
 
-  [(same [(append [#front #back]) [apple banana]]) #front #back]
+  [
+    (same [(append [#front #back]) [apple banana]])
+    #front
+    #back
+  ]

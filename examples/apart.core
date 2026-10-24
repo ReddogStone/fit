@@ -27,4 +27,9 @@
       zero
   ]
 
-  [(isPositive [whatever (succ zero)]) (hasValue (just secret)) (onlyZero #unknown) #unknown]
+  [
+    (isPositive [whatever (succ zero)])
+    (hasValue (just secret))
+    (onlyZero #unknown)
+    #unknown
+  ]

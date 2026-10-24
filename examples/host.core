@@ -15,4 +15,10 @@
     | old
   ]
 
-  [(add [2 3]) (lt [2 3]) (concat ["foo" (show [(add [10 2])])]) (mul [2 pi]) (add [(succ zero) zero])]
+  [
+    (add [2 3])
+    (lt [2 3])
+    (concat ["foo" (show [(add [10 2])])])
+    (mul [2 pi])
+    (add [(succ zero) zero])
+  ]

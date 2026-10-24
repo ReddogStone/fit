@@ -28,7 +28,11 @@
   program := [
     [zero succ add fact] :>
       two := (succ (succ zero))
-      [(add [two two]) (fact two) (add [(succ zero) #unknown])]
+      [
+        (add [two two])
+        (fact two)
+        (add [(succ zero) #unknown])
+      ]
   ]
 
   alpha := [

@@ -23,7 +23,11 @@
         count :>
           (add [count 1])
       ]
-      [(greet "world") ((twice inc) 1) (lt [(inc 2) 4])]
+      [
+        (greet "world")
+        ((twice inc) 1)
+        (lt [(inc 2) 4])
+      ]
   ]
 
   [

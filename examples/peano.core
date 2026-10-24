@@ -40,17 +40,17 @@
       (program [[zero succ] (peano [zero succ tie])])
   ]
 
-  reading := [
+  readWith := [
     assertion :> [
       model :>
         (assertion (solve (run model)))
     ]
   ]
-  valueReading := (reading assertOne)
-  typeReading := (reading assertAgree)
+  readValues := (readWith assertOne)
+  readTypes := (readWith assertAgree)
 
-  values := [$zero $succ]
-  types := [
+  valueModel := [$zero $succ]
+  typeModel := [
     nat
     [
       ^nat :>
@@ -58,4 +58,7 @@
     ]
   ]
 
-  [(valueReading values) (typeReading types)]
+  values := (readValues valueModel)
+  types := (readTypes typeModel)
+
+  [values types]

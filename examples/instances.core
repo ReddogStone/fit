@@ -1,0 +1,87 @@
+-- one eq for the whole program, tied at the root: a library uses it before the later types add their rules
+
+[tie foreign solve host prelude] :>
+  [number string bool true false add sub mul lt le gt ge hostEq | hostRest] := (host [foreign])
+  [same assertOne assertAgree | preludeRest] := (prelude [tie number string bool])
+  fix := tie
+
+  append := [
+    [[] rest] :>
+      rest
+    [[head | tail] rest] :>
+      [head | (append [tail rest])]
+  ]
+  branch := [
+    [^true then else] :>
+      then
+    [^false then else] :>
+      else
+  ]
+
+  library := [
+    [eq] :>
+      member := [
+        [item []] :>
+          false
+        [item [head | tail]] :>
+          (branch [(eq [item head]) true (member [item tail])])
+      ]
+      [member]
+  ]
+
+  colors := [
+    [] :>
+      red := $red
+      blue := $blue
+      eqColor := [
+        [^red ^red] :>
+          true
+        [^blue ^blue] :>
+          true
+        [^red ^blue] :>
+          false
+        [^blue ^red] :>
+          false
+      ]
+      [red blue eqColor]
+  ]
+
+  numbers := [
+    [] :>
+      eqNumber := [
+        [(^number left) (^number right)] :>
+          (hostEq [(number left) (number right)])
+      ]
+      [eqNumber]
+  ]
+
+  pairs := [
+    [eq] :>
+      pair := $pair
+      eqPair := [
+        [(^pair [left1 right1]) (^pair [left2 right2])] :>
+          (branch [(eq [left1 left2]) (eq [right1 right2]) false])
+      ]
+      [pair eqPair]
+  ]
+
+  eq := (tie [
+    self :>
+      [red blue eqColor] := (colors [])
+      [eqNumber] := (numbers [])
+      [pair eqPair] := (pairs [self])
+      (append [eqColor (append [eqNumber eqPair])])
+  ])
+
+  [member] := (library [eq])
+  [red blue eqColor] := (colors [])
+  [pair eqPair] := (pairs [eq])
+
+  [
+    (same [(member [red [blue red]]) true])
+    (same [(member [blue [red]]) false])
+    (same [(member [2 [1 2 3]]) true])
+    (same [(member [4 [1 2 3]]) false])
+    (same [(member [(pair [red 2]) [(pair [blue 2]) (pair [red 2])]]) true])
+    (same [(member [(pair [red 3]) [(pair [blue 2]) (pair [red 2])]]) false])
+  ]

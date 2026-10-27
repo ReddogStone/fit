@@ -1,0 +1,14 @@
+-- solve is lazy: three answers out of endlessly many, the rest never asked for
+
+[tie foreign solve host prelude] :>
+  fix := tie
+  zero := $zero
+  succ := $succ
+  add := <
+    [^zero right] :>
+      right
+    [(^succ left) right] :>
+      (succ (add [left right]))
+  >
+  [first second third | rest] := (solve (add [#a #b]))
+  [first second third]

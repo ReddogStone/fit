@@ -25,6 +25,9 @@ anyType = \case
 solveName :: Name
 solveName = hostSym "solve"
 
+resumeName :: Name
+resumeName = hostSym "resume"
+
 hostTypeOf :: Term -> Maybe HostType
 hostTypeOf = \case
   Sym ('"' : _) -> Just String

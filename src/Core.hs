@@ -37,11 +37,14 @@ data S = S
   { counter :: Int,
     subst :: Map Int Term,
     names :: Map Int Name,
-    active :: [Term]
+    active :: [Term],
+    pending :: Map Int Search
   }
 
+data Search = Search {since :: Int, remaining :: [Either (Err, S) (Term, S)]}
+
 initial :: Program -> S
-initial p = S (length (unknowns p)) Map.empty (Map.fromList (zip [0 ..] (unknowns p))) []
+initial p = S (length (unknowns p)) Map.empty (Map.fromList (zip [0 ..] (unknowns p))) [] Map.empty
 
 newtype M a = M {runM :: S -> [Either (Err, S) (a, S)]}
 
@@ -154,6 +157,7 @@ whnf t = case t of
     case f' of
       Sym n | isHostName n -> select t (hostCandidates n) a
       Sym n | n == solveName -> solutions a
+      Sym n | n == resumeName -> resumeOf a
       Sym n | n == foreignName -> foreignOf t a
       Sym n | n == tieName -> knotOf a
       Rule {} -> throw (NotARule t)
@@ -189,10 +193,33 @@ foreignOf node key =
 solutions :: Term -> M Term
 solutions question = do
   outer <- get'
-  let results = runM (nf question) outer
-  case [e | Left (e, _) <- results, fatal e] of
-    e : _ -> throw e
-    [] -> chain <$> mapM (\(t, inner) -> reimport (counter outer) inner (resolveTerm inner t)) [(t, s) | Right (t, s) <- results]
+  pull (Search (counter outer) (runM (nf question) outer))
+
+pull :: Search -> M Term
+pull search = case remaining search of
+  [] -> pure Nil
+  Left (e, _) : rest
+    | fatal e -> throw e
+    | otherwise -> pull search {remaining = rest}
+  Right (t, inner) : rest -> do
+    first <- reimport (since search) inner (resolveTerm inner t)
+    key <- fresh
+    case key of
+      Meta k -> do
+        modify' (\s -> s {pending = Map.insert k search {remaining = rest} (pending s)})
+        tail' <- share (App (Sym resumeName) key)
+        pure (Cons first tail')
+      _ -> pure (Cons first Nil)
+
+resumeOf :: Term -> M Term
+resumeOf key = case key of
+  Meta k ->
+    gets' (Map.lookup k . pending) >>= \case
+      Nothing -> pure Nil
+      Just search -> do
+        modify' (\s -> s {pending = Map.delete k (pending s)})
+        pull search
+  _ -> pure Nil
 
 reimport :: Int -> S -> Term -> M Term
 reimport since inner = fmap fst . go Map.empty

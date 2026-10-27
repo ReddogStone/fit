@@ -8,24 +8,24 @@
   zero := $zero
   succ := $succ
 
-  peano := [
+  peano := <
     [zero succ fix] :>
-      add := [
+      add := <
         [^zero right] :>
           right
         [(^succ left) right] :>
           (succ (add [left right]))
-      ]
-      fact := [
+      >
+      fact := <
         ^zero :>
           (succ zero)
         (^succ below) :>
           (add [(succ below) (fact below)])
-      ]
+      >
       [zero succ add fact]
-  ]
+  >
 
-  program := [
+  program := <
     [zero succ add fact] :>
       two := (succ (succ zero))
       [
@@ -33,48 +33,48 @@
         (fact two)
         [zero two]
       ]
-  ]
+  >
 
-  alphaOf := [
-    [[] [] self] :> [
+  alphaOf := <
+    [[] [] self] :> <
       [] :>
         []
       [head | tail] :>
         [(self head) | (self tail)]
-    ]
-    [[v | vs] [t | ts] self] :> [
+    >
+    [[v | vs] [t | ts] self] :> <
       ^v :>
         t
       (^v inner) :>
         (t (self inner))
-      | (alphaOf [vs ts self])
-    ]
-  ]
-  contract := [
+      (alphaOf [vs ts self])
+    >
+  >
+  contract := <
     [generators values types] :>
-      alpha := (tie [
+      alpha := (tie <
         self :>
           (alphaOf [values types self])
-      ])
+      >)
       (alpha generators)
-  ]
+  >
 
   valueModel := [zero succ]
   typeModel := [
     nat
-    [
+    <
       ^nat :>
         nat
-    ]
+    >
   ]
 
   values := (assertOne (solve (program (peano [zero succ tie]))))
   types := (assertAgree (solve (program (peano [
     nat
-    [
+    <
       ^nat :>
         nat
-    ]
+    >
     tie
   ]))))
 

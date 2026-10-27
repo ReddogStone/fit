@@ -3,9 +3,9 @@
 [tie foreign solve host prelude] :>
   [number | hostRest] := (host [foreign])
   fix := tie
-  loop := [
+  loop := <
     count :>
       (loop count)
-  ]
+  >
 
   (loop 1)

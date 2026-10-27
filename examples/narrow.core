@@ -6,12 +6,12 @@
   fix := tie
   apple := $apple
   banana := $banana
-  append := [
+  append := <
     [[] rest] :>
       rest
     [[head | tail] rest] :>
       [head | (append [tail rest])]
-  ]
+  >
 
   [
     (append [[apple] [banana]])

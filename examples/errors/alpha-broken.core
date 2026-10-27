@@ -8,42 +8,42 @@
   zero := $zero
   succ := $succ
 
-  peano := [
+  peano := <
     [zero succ fix] :>
-      add := [
+      add := <
         [^zero right] :>
           right
         [(^succ left) right] :>
           (succ (add [left right]))
-      ]
+      >
       [zero succ add]
-  ]
+  >
 
-  program := [
+  program := <
     [zero succ add] :>
       [(add [(succ zero) zero]) zero]
-  ]
+  >
 
-  alpha := [
+  alpha := <
     ^zero :>
       nat
     (^succ below) :>
       (succ (alpha below))
-  ]
-  map := [
+  >
+  map := <
     [fn []] :>
       []
     [fn [head | tail]] :>
       [(fn head) | (map [fn tail])]
-  ]
+  >
 
   values := (assertOne (solve (program (peano [zero succ tie]))))
   types := (assertAgree (solve (program (peano [
     nat
-    [
+    <
       ^nat :>
         nat
-    ]
+    >
     tie
   ]))))
 

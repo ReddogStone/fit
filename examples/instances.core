@@ -5,35 +5,35 @@
   [same assertOne assertAgree | preludeRest] := (prelude [tie number string bool])
   fix := tie
 
-  append := [
+  append := <
     [[] rest] :>
       rest
     [[head | tail] rest] :>
       [head | (append [tail rest])]
-  ]
-  branch := [
+  >
+  branch := <
     [^true then else] :>
       then
     [^false then else] :>
       else
-  ]
+  >
 
-  library := [
+  library := <
     [eq] :>
-      member := [
+      member := <
         [item []] :>
           false
         [item [head | tail]] :>
           (branch [(eq [item head]) true (member [item tail])])
-      ]
+      >
       [member]
-  ]
+  >
 
-  colors := [
+  colors := <
     [] :>
       red := $red
       blue := $blue
-      eqColor := [
+      eqColor := <
         [^red ^red] :>
           true
         [^blue ^blue] :>
@@ -42,36 +42,36 @@
           false
         [^blue ^red] :>
           false
-      ]
+      >
       [red blue eqColor]
-  ]
+  >
 
-  numbers := [
+  numbers := <
     [] :>
-      eqNumber := [
+      eqNumber := <
         [(^number left) (^number right)] :>
           (hostEq [(number left) (number right)])
-      ]
+      >
       [eqNumber]
-  ]
+  >
 
-  pairs := [
+  pairs := <
     [eq] :>
       pair := $pair
-      eqPair := [
+      eqPair := <
         [(^pair [left1 right1]) (^pair [left2 right2])] :>
           (branch [(eq [left1 left2]) (eq [right1 right2]) false])
-      ]
+      >
       [pair eqPair]
-  ]
+  >
 
-  eq := (tie [
+  eq := (tie <
     self :>
       [red blue eqColor] := (colors [])
       [eqNumber] := (numbers [])
       [pair eqPair] := (pairs [self])
-      (append [eqColor (append [eqNumber eqPair])])
-  ])
+      <eqColor eqNumber eqPair>
+  >)
 
   [member] := (library [eq])
   [red blue eqColor] := (colors [])

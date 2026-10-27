@@ -5,47 +5,47 @@
   [same assertOne assertAgree | preludeRest] := (prelude [tie number string bool])
   nat := $nat
 
-  peano := [
+  peano := <
     [zero succ fix] :>
-      add := [
+      add := <
         [^zero right] :>
           right
         [(^succ left) right] :>
           (succ (add [left right]))
-      ]
-      mul := [
+      >
+      mul := <
         [^zero right] :>
           zero
         [(^succ left) right] :>
           (add [right (mul [left right])])
-      ]
-      fact := [
+      >
+      fact := <
         ^zero :>
           (succ zero)
         (^succ below) :>
           (mul [(succ below) (fact below)])
-      ]
+      >
       [add fact]
-  ]
+  >
 
-  program := [
+  program := <
     [[zero succ] [add fact]] :>
       two := (succ (succ zero))
       three := (succ two)
       [(add [two two]) (fact three)]
-  ]
+  >
 
-  run := [
+  run := <
     [zero succ] :>
       (program [[zero succ] (peano [zero succ tie])])
-  ]
+  >
 
-  readWith := [
-    assertion :> [
+  readWith := <
+    assertion :> <
       model :>
         (assertion (solve (run model)))
-    ]
-  ]
+    >
+  >
   readValues := (readWith assertOne)
   readTypes := (readWith assertAgree)
 
@@ -54,10 +54,10 @@
   valueModel := [zero succ]
   typeModel := [
     nat
-    [
+    <
       ^nat :>
         nat
-    ]
+    >
   ]
 
   [value1 value2] := (readValues valueModel)

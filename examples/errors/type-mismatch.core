@@ -1,12 +1,12 @@
 [tie foreign solve host prelude] :>
   [number | hostRest] := (host [foreign])
-  sin := [
+  sin := <
     ^number :>
       number
-  ]
-  identity := [
+  >
+  identity := <
     input :>
       input
-  ]
+  >
 
   (sin identity)

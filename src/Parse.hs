@@ -24,6 +24,7 @@ data Raw
   | RApp Raw Raw
   | RRule Arrow Raw Raw
   | RChain [Raw] (Maybe Raw)
+  | RAlt [Raw]
   | RScope [Binding] Bool Raw
   | RPipe Raw [Step]
 
@@ -46,7 +47,7 @@ desugar = foldl (\arg step -> RApp (applicable (stepRaw step)) arg)
 
 applicable :: Raw -> Raw
 applicable = \case
-  rule@RRule {} -> RChain [rule] Nothing
+  rule@RRule {} -> RAlt [rule]
   other -> other
 
 data Joiner = Let | Bind deriving (Eq)
@@ -79,6 +80,7 @@ lower = \case
   RApp f a -> RApp (lower f) (lower a)
   RRule d l r -> RRule d (lower l) (lower r)
   RChain items rest -> RChain (map lower items) (lower <$> rest)
+  RAlt items -> RAlt (map lower items)
   RScope bindings g result -> RScope [b {pattern = lower (pattern b), value = lower (value b)} | b <- bindings] g (lower result)
   RPipe start steps -> RPipe (lower start) (map (mapStep lower) steps)
   literal -> literal
@@ -127,8 +129,11 @@ atom =
       RLiteral Number . show <$> lexeme (L.signed (pure ()) L.decimal :: Parser Integer),
       RLiteral String . show <$> lexeme (char '"' *> manyTill L.charLiteral (char '"')),
       between (symbol "(") (symbol ")") (term >>= \t -> ruled t <|> RApp t <$> term <|> grouped t),
-      between (symbol "[") (symbol "]") chainBody
+      between (symbol "[") (symbol "]") chainBody,
+      between opener (symbol ">") (RAlt <$> items)
     ]
+  where
+    opener = lexeme (try (char '<' <* notFollowedBy (oneOf ("-:" :: String))))
 
 ruled :: Raw -> Parser Raw
 ruled t =
@@ -143,15 +148,17 @@ grouped = \case
   _ -> empty
 
 chainBody :: Parser Raw
-chainBody = items
-  where
-    items = RChain <$> many (term >>= \t -> ruled t <|> pure t) <*> optional (symbol "|" *> atom)
+chainBody = RChain <$> items <*> optional (symbol "|" *> atom)
+
+items :: Parser [Raw]
+items = many (term >>= \t -> ruled t <|> pure t)
 
 checkSides :: Raw -> Either String ()
 checkSides = \case
   RRule _ l r -> left l >> checkSides r
   RApp f a -> checkSides f >> checkSides a
   RChain items rest -> mapM_ checkSides items >> maybe (pure ()) checkSides rest
+  RAlt items -> mapM_ checkSides items
   RScope bindings _ result -> mapM_ (\b -> left (pattern b) >> checkSides (value b)) bindings >> checkSides result
   RPipe start steps -> mapM_ checkSides (start : map stepRaw steps)
   RPin v -> Left ("^" ++ v ++ " outside a left side")
@@ -159,6 +166,7 @@ checkSides = \case
   where
     left = \case
       RRule {} -> Left "a rule inside a left side"
+      RAlt {} -> Left "alternatives inside a left side"
       RScope {} -> Left "a binding inside a left side"
       RPipe {} -> Left "a pipe inside a left side"
       RNew s -> Left ("$" ++ s ++ " inside a left side")
@@ -176,6 +184,7 @@ checkCreations raw = forM_ (nub (creations raw)) $ \s ->
       RApp f a -> creations f ++ creations a
       RRule _ l r -> creations l ++ creations r
       RChain items rest -> concatMap creations items ++ maybe [] creations rest
+      RAlt items -> concatMap creations items
       RScope bindings _ result -> concatMap (creations . value) bindings ++ creations result
       RPipe start steps -> concatMap creations (start : map stepRaw steps)
       _ -> []
@@ -184,11 +193,11 @@ lint :: Raw -> Either String ()
 lint = \case
   RRule _ l r -> lint l >> lint r
   RApp f a -> lint f >> lint a
-  RChain items rest -> do
+  RAlt items -> do
     let lefts = [l | RRule _ l _ <- items]
     when (length lefts == length items) (mapM_ apartRaw (pairs lefts))
     mapM_ lint items
-    maybe (pure ()) lint rest
+  RChain items rest -> mapM_ lint items >> maybe (pure ()) lint rest
   RScope bindings _ result -> mapM_ (lint . value) bindings >> lint result
   RPipe start steps -> mapM_ lint (start : map stepRaw steps)
   _ -> pure ()
@@ -198,7 +207,7 @@ lint = \case
       x : rest -> [(x, y) | y <- rest] ++ pairs rest
 
 apartRaw :: (Raw, Raw) -> Either String ()
-apartRaw (p, q) = if go (cons p) (cons q) then pure () else Left ("two rules in one chain overlap: " ++ showRaw p ++ " and " ++ showRaw q)
+apartRaw (p, q) = if go (cons p) (cons q) then pure () else Left ("two alternatives overlap: " ++ showRaw p ++ " and " ++ showRaw q)
   where
     go a b = case (a, b) of
       (RVar _, _) -> False
@@ -210,6 +219,7 @@ apartRaw (p, q) = if go (cons p) (cons q) then pure () else Left ("two rules in 
       _ -> True
     cons = \case
       RChain items rest -> foldr (\x r -> RApp (RApp (RNew "[|]") (cons x)) r) (maybe (RNew "[]") cons rest) items
+      RAlt _ -> RNew "<>"
       RApp f a -> RApp (cons f) (cons a)
       t -> t
 
@@ -223,6 +233,7 @@ showRaw = \case
   RApp f a -> "(" ++ showRaw f ++ " " ++ showRaw a ++ ")"
   RRule _ l r -> showRaw l ++ " :> " ++ showRaw r
   RChain items rest -> "[" ++ joinWith " " (map showRaw items) ++ maybe "" ((" | " ++) . showRaw) rest ++ "]"
+  RAlt items -> "<" ++ joinWith " " (map showRaw items) ++ ">"
   RScope _ _ r -> showRaw r
   RPipe start steps -> showRaw (desugar start steps)
   where
@@ -237,6 +248,7 @@ holesOf = nub . go
       RVar v -> [v]
       RApp f a -> go f ++ go a
       RChain items rest -> concatMap go items ++ maybe [] go rest
+      RAlt items -> concatMap go items
       _ -> []
 
 freesOf :: Raw -> [Name]
@@ -246,6 +258,7 @@ freesOf = nub . go
       RFree v -> [v]
       RApp f a -> go f ++ go a
       RChain items rest -> concatMap go items ++ maybe [] go rest
+      RAlt items -> concatMap go items
       RScope bindings _ result -> concatMap (go . value) bindings ++ go result
       RPipe start steps -> concatMap go (start : map stepRaw steps)
       _ -> []
@@ -260,6 +273,7 @@ underRules n (forVar, forPin) = outside
       RApp f a -> both RApp (outside f) (outside a)
       RRule d l r -> both (RRule d) (inside l) (inside r)
       RChain items rest -> chain' outside items rest
+      RAlt items -> alt' outside items
       RScope bindings g result -> let (p, bs, r) = scope outside bindings result in (p, RScope bs g r)
       RPipe start steps -> pipe' outside start steps
       t -> (False, t)
@@ -269,10 +283,12 @@ underRules n (forVar, forPin) = outside
       RApp f a -> both RApp (inside f) (inside a)
       RRule d l r -> both (RRule d) (inside l) (inside r)
       RChain items rest -> chain' inside items rest
+      RAlt items -> alt' inside items
       RScope bindings g result -> let (p, bs, r) = scope inside bindings result in (p, RScope bs g r)
       RPipe start steps -> pipe' inside start steps
       t -> (False, t)
     both c (p, x) (q, y) = (p || q, c x y)
+    alt' go items = let (ps, items') = unzip (map go items) in (or ps, RAlt items')
     pipe' go start steps =
       let (p, start') = go start
           (ps, steps') = unzip [let (q, t') = go (stepRaw s) in (q, mapStep (const t') s) | s <- steps]
@@ -308,6 +324,7 @@ convert env = \case
   RChain items rest -> case rest of
     Nothing -> chain <$> mapM go items
     Just tail' -> foldr Cons <$> go tail' <*> mapM go items
+  RAlt items -> Alt <$> mapM go items
   RPipe start steps -> go (desugar start steps)
   RScope [] _ result -> go result
   RScope (b : rest) g result -> do
@@ -316,16 +333,16 @@ convert env = \case
         self = knotName (intercalate "#" holes)
         stand n = case pattern b of
           RVar _ -> (RVar self, RPin self)
-          shape -> let project ref = RApp (RChain [RRule Forward shape (RVar n)] Nothing) ref in (project (RVar self), project (RPin self))
+          shape -> let project ref = RApp (RAlt [RRule Forward shape (RVar n)]) ref in (project (RVar self), project (RPin self))
         (tied, renamed) = foldr (\n (p, raw) -> let (q, raw') = underRules n (stand n) raw in (p || q, raw')) (False, value b) holes
     inner <- convert bound (RScope rest g result)
     valueTerm <-
       if tied
         then do
           fix <- either (const (Left "a recursive line needs fix in scope")) Right (go (RVar "fix"))
-          App fix . chain . (: []) . Rule [self] (Var 0 0) <$> convert env {frames = [self] : frames env} renamed
+          App fix . Alt . (: []) . Rule [self] (Var 0 0) <$> convert env {frames = [self] : frames env} renamed
         else go (value b)
-    line <- chain . (: []) <$> (Rule holes <$> convert bound (pattern b) <*> pure inner)
+    line <- Alt . (: []) <$> (Rule holes <$> convert bound (pattern b) <*> pure inner)
     case joiner b of
       Let -> pure (App line valueTerm)
       Bind -> do

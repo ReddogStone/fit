@@ -5,11 +5,11 @@
   apple := $apple
   banana := $banana
   cherry := $cherry
-  append := [
+  append := <
     [[] rest] :>
       rest
     [[head | tail] rest] :>
       [head | (append [tail rest])]
-  ]
+  >
 
   (same [(append [#front [cherry]]) [apple banana]])

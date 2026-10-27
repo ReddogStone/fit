@@ -15,5 +15,5 @@ run entry loaded = intercalate "\n" (map line (evaluate program))
 
 applicable :: Term -> Term
 applicable = \case
-  rule@Rule {} -> chain [rule]
+  rule@Rule {} -> Alt [rule]
   other -> other

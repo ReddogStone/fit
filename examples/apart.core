@@ -10,22 +10,22 @@
   secret := $secret
   whatever := $whatever
 
-  isPositive := [
+  isPositive := <
     [ignored ^zero] :>
       blank
     [ignored (^succ below)] :>
       positive
-  ]
-  hasValue := [
+  >
+  hasValue := <
     (^just content) :>
       positive
     ^nothing :>
       blank
-  ]
-  onlyZero := [
+  >
+  onlyZero := <
     ^zero :>
       zero
-  ]
+  >
 
   [
     (isPositive [whatever (succ zero)])

@@ -4,11 +4,11 @@
   secret := $secret
   just := $just
   nothing := $nothing
-  hasValue := [
+  hasValue := <
     (^just content) :>
       positive
     ^nothing :>
       blank
-  ]
+  >
 
   (hasValue secret)

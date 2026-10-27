@@ -1,1 +1,1 @@
-only a chain can be applied: (identity ((foreign number) 5))
+only alternatives can be applied: (identity ((foreign number) 5))

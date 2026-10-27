@@ -1,10 +1,10 @@
 [tie foreign solve host prelude] :>
   [number string bool true false add | hostRest] := (host [foreign])
   old := add
-  add := [
+  add := <
     [left right] :>
       left
-    | old
-  ]
+    old
+  >
 
   (add [1 2])

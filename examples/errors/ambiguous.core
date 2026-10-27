@@ -4,12 +4,12 @@
   fix := tie
   apple := $apple
   banana := $banana
-  append := [
+  append := <
     [[] rest] :>
       rest
     [[head | tail] rest] :>
       [head | (append [tail rest])]
-  ]
+  >
 
   [
     (same [(append [#front #back]) [apple banana]])

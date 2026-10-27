@@ -44,14 +44,19 @@ flatWith breaking = \case
         items' <- mapM (flatWith breaking) items
         rest' <- traverse (flatWith breaking) rest
         pure ("[" ++ unwords items' ++ maybe "" (" | " ++) rest' ++ "]")
+  RAlt items
+    | breaking && length items > 2 && not (all atom items) -> Nothing
+    | otherwise -> (\items' -> "<" ++ unwords items' ++ ">") <$> mapM (flatWith breaking) items
   RScope {} -> Nothing
   where
     argument = \case
       a@RChain {} -> flatLeft a
+      a@RAlt {} -> flatLeft a
       a -> flatOperand a
     atom = \case
       RApp {} -> False
       RChain {} -> False
+      RAlt {} -> False
       RRule {} -> False
       RPipe {} -> False
       RScope {} -> False
@@ -95,6 +100,11 @@ layout indent column raw = case flat raw of
         ++ maybe "" (\t -> pad inner ++ "| " ++ layout inner (inner + 2) t ++ "\n") rest
         ++ pad indent
         ++ "]"
+    RAlt items ->
+      "<\n"
+        ++ concatMap (\x -> pad inner ++ layout inner inner x ++ "\n") items
+        ++ pad indent
+        ++ ">"
     RRule Forward l r -> leftSide column l ++ " :>" ++ ruleBody r
     RRule Reversed l r -> body indent column r ++ "\n" ++ pad inner ++ "<: " ++ leftSide (inner + 3) l
     RPipe start steps -> operand indent column start ++ concatMap ((" |> " ++) . step) steps
@@ -110,10 +120,13 @@ layout indent column raw = case flat raw of
       _ -> layout indent col l
     argument col a = case a of
       RChain {} -> leftSide col a
+      RAlt {} -> leftSide col a
       _ -> operand indent col a
     ruleBody r = case r of
-      RChain {} | maybe True (\s -> inner + length s > width) (flat r) -> " " ++ layout indent inner r
+      RChain {} | hugs r -> " " ++ layout indent inner r
+      RAlt {} | hugs r -> " " ++ layout indent inner r
       _ -> "\n" ++ pad inner ++ body inner inner r
+    hugs r = maybe True (\s -> inner + length s > width) (flat r)
     step = \case
       Feed f -> operand indent inner f
       Into r -> layout indent inner r

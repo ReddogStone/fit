@@ -10,6 +10,7 @@ data Term
   | Meta Int
   | App Term Term
   | Rule [Name] Term Term
+  | Alt [Term]
   | Cons Term Term
   | Nil
   deriving (Eq, Ord, Show)
@@ -57,6 +58,7 @@ pretty namer = go []
       App (Sym c) (Sym s) | c == numberName || c == stringName, isLiteral s -> s
       App f a -> "(" ++ go stack f ++ " " ++ go stack a ++ ")"
       Rule ns l r -> "(" ++ go (ns : stack) l ++ " :> " ++ go (ns : stack) r ++ ")"
+      Alt items -> "<" ++ unwords (map (go stack) items) ++ ">"
       t -> case unchain t of
         (items, Nothing) -> "[" ++ unwords (map (go stack) items) ++ "]"
         (items, Just rest) -> "[" ++ unwords (map (go stack) items) ++ " | " ++ go stack rest ++ "]"

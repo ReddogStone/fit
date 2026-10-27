@@ -5,33 +5,33 @@
   [same assertOne assertAgree | preludeRest] := (prelude [tie number string bool])
   nat := $nat
 
-  parity := [
+  parity := <
     [zero succ true false fix] :>
       [even odd] := [
-        [
+        <
           ^zero :>
             true
           (^succ below) :>
             (odd below)
-        ]
-        [
+        >
+        <
           ^zero :>
             false
           (^succ below) :>
             (even below)
-        ]
+        >
       ]
       [(even (succ (succ zero))) (odd (succ (succ (succ zero))))]
-  ]
+  >
 
   [
     (assertOne (solve (parity [$zero $succ true false tie])))
     (assertAgree (solve (parity [
       nat
-      [
+      <
         ^nat :>
           nat
-      ]
+      >
       bool
       bool
       tie

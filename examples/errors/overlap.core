@@ -2,11 +2,11 @@
   yes := $yes
   maybe := $maybe
   zero := $zero
-  isZero := [
+  isZero := <
     ^zero :>
       yes
     anything :>
       maybe
-  ]
+  >
 
   (isZero zero)

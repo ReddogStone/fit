@@ -132,6 +132,7 @@ inst depth fillers = \case
   App f a -> App (inst depth fillers f) (inst depth fillers a)
   Cons x rest -> Cons (inst depth fillers x) (inst depth fillers rest)
   Rule ns l r -> Rule ns (inst (depth + 1) fillers l) (inst (depth + 1) fillers r)
+  Alt items -> Alt (map (inst depth fillers) items)
   t -> t
 
 isHostName :: Name -> Bool
@@ -156,7 +157,9 @@ whnf t = case t of
       Sym n | n == foreignName -> foreignOf t a
       Sym n | n == tieName -> knotOf a
       Rule {} -> throw (NotARule t)
-      Cons {} -> do
+      Cons {} -> throw (NotARule t)
+      Nil -> throw (NotARule t)
+      Alt {} -> do
         shared <- share a
         key <- gets' (\s -> App f' (resolveTerm s shared))
         reentered <- gets' (elem key . active)
@@ -167,7 +170,6 @@ whnf t = case t of
             result <- candidatesOf f' >>= \cs -> select t cs shared
             modify' (\s -> s {active = drop 1 (active s)})
             pure result
-      Nil -> throw (NoRule t)
       _ -> pure (App f' a)
   _ -> pure t
 
@@ -215,7 +217,16 @@ reimport since inner = fmap fst . go Map.empty
         (l', memo1) <- go memo l
         (r', memo2) <- go memo1 r
         pure (Rule ns l' r', memo2)
+      Alt items -> do
+        (items', memo') <- goAll memo items
+        pure (Alt items', memo')
       t -> pure (t, memo)
+    goAll memo = \case
+      [] -> pure ([], memo)
+      x : xs -> do
+        (x', memo1) <- go memo x
+        (xs', memo2) <- goAll memo1 xs
+        pure (x' : xs', memo2)
 
 resolveTerm :: S -> Term -> Term
 resolveTerm s = go Set.empty
@@ -228,6 +239,7 @@ resolveTerm s = go Set.empty
       App f a -> App (go seen f) (go seen a)
       Cons x rest -> Cons (go seen x) (go seen rest)
       Rule ns l r -> Rule ns (go seen l) (go seen r)
+      Alt items -> Alt (map (go seen) items)
       t -> t
 
 nf :: Term -> M Term
@@ -249,11 +261,9 @@ candidatesOf :: Term -> M [Candidate]
 candidatesOf t = do
   t' <- whnf t
   case t' of
-    Nil -> pure []
     Sym s | isHostName s -> pure (hostCandidates s)
-    Cons x rest -> do
-      here <- whnf x >>= instantiate
-      (here :) <$> candidatesOf rest
+    Alt items -> concat <$> mapM candidatesOf items
+    rule@Rule {} -> (: []) <$> instantiate rule
     _ -> throw (NotARule t')
 
 instantiate :: Term -> M Candidate
@@ -439,6 +449,7 @@ unify a b = do
         (Cons x xs, Cons y ys) -> unify x y >> unify xs ys
         (Nil, Nil) -> pure ()
         (Rule {}, Rule {}) | a'' == b'' -> pure ()
+        (Alt {}, Alt {}) | a'' == b'' -> pure ()
         _ -> throw (Mismatch a'' b'')
   where
     anyAgainst ty v = case v of
@@ -453,6 +464,7 @@ unify a b = do
       Nothing -> case t of
         App f x -> hasAny f || hasAny x
         Cons x rest -> hasAny x || hasAny rest
+        Alt items -> any hasAny items
         _ -> False
 
 bindChecked :: Int -> Term -> M ()
@@ -468,6 +480,7 @@ bindChecked m t = do
         | otherwise -> lookupMeta n >>= maybe (pure False) (occurs (Set.insert n seen))
       App f a -> (||) <$> occurs seen f <*> occurs seen a
       Cons x rest -> (||) <$> occurs seen x <*> occurs seen rest
+      Alt items -> anyM (occurs seen) items
       _ -> pure False
 
 hostArgs :: Term -> Term -> M [Term]
@@ -537,6 +550,7 @@ expandTerm s = expand Set.empty
             _ -> Meta m
       App f a -> App (expand seen f) (expand seen a)
       Cons x rest -> Cons (expand seen x) (expand seen rest)
+      Alt items -> Alt (map (expand seen) items)
       t -> t
     isData = \case
       Sym n -> not (isHostName n)
@@ -553,4 +567,4 @@ describe s = \case
   Mismatch a b -> "mismatch: " ++ display s a ++ " against " ++ display s b
   Occurs m t -> "infinite: " ++ display s (Meta m) ++ " in " ++ display s t
   Unbounded t -> "ambiguous: " ++ display s t ++ " fits every host rule"
-  NotARule t -> "only a chain can be applied: " ++ display s t
+  NotARule t -> "only alternatives can be applied: " ++ display s t

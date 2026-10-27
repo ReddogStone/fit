@@ -8,24 +8,24 @@
   zero := $zero
   succ := $succ
 
-  peano := [
+  peano := <
     [zero succ fix] :>
-      add := [
+      add := <
         [^zero right] :>
           right
         [(^succ left) right] :>
           (succ (add [left right]))
-      ]
-      fact := [
+      >
+      fact := <
         ^zero :>
           (succ zero)
         (^succ below) :>
           (add [(succ below) (fact below)])
-      ]
+      >
       [zero succ add fact]
-  ]
+  >
 
-  program := [
+  program := <
     [zero succ add fact] :>
       two := (succ (succ zero))
       [
@@ -33,28 +33,28 @@
         (fact two)
         (add [(succ zero) #unknown])
       ]
-  ]
+  >
 
-  alpha := [
+  alpha := <
     ^zero :>
       nat
     (^succ below) :>
       nat
-  ]
-  map := [
+  >
+  map := <
     [fn []] :>
       []
     [fn [head | tail]] :>
       [(fn head) | (map [fn tail])]
-  ]
+  >
 
   values := (assertOne (solve (program (peano [zero succ tie]))))
   types := (assertAgree (solve (program (peano [
     nat
-    [
+    <
       ^nat :>
         nat
-    ]
+    >
     tie
   ]))))
 

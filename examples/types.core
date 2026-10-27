@@ -7,28 +7,28 @@
     [tie number string bool]
   )
 
-  greeting := [
+  greeting := <
     [number string concat show add lt] :>
-      greet := [
+      greet := <
         name :>
           (concat ["hello " name])
-      ]
-      twice := [
-        step :> [
+      >
+      twice := <
+        step :> <
           start :>
             (step (step start))
-        ]
-      ]
-      inc := [
+        >
+      >
+      inc := <
         count :>
           (add [count 1])
-      ]
+      >
       [
         (greet "world")
         ((twice inc) 1)
         (lt [(inc 2) 4])
       ]
-  ]
+  >
 
   [
     (assertOne (solve (greeting [number string concat show add lt])))
